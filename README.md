@@ -1,3 +1,7 @@
+
+
+
+
 # HCI Assignment 1 (Part II): Fitts' Law Experiment
 FittsLaw_part2 工工系張巧佩
 
@@ -22,13 +26,11 @@ FittsLaw_part2 工工系張巧佩
 ## 3. Experiment Screen Recording (實驗錄影)
 
 你可以透過以下方式展示影片（二擇一）：
-
+https://github.com/user-attachments/assets/4acb2068-077e-4d13-9715-a1dd5d1d842c
 <!-- 方式 A：直接放連結與預覽按鈕（推薦） -->
 [![Watch the Experiment Video](https://img.shields.io/badge/YouTube-Video_Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/uL5jaONN56E)
 
 > 點擊上方按鈕前往觀看完整實驗錄影（已設為公開/知道連結者可看）。
-
-<!-- 方式 B：GitHub 支援直接將 MP4 檔案拖曳進編輯框上傳，會自動生成播放器語法 -->
 
 ---
 
