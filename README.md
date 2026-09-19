@@ -33,19 +33,7 @@ FittsLaw_part2 工工系張巧佩
 ---
 
 ## 4. Empirical Analysis & Fitts' Law Formula (數據分析與回歸公式)
-
-### Experimental Data Summary (9 Conditions)
-| Trial | Average Distance (pixels) | Width (pixels) | Index of Difficulty (bits) | Average Time (milliseconds) |
-| :---: | :---: | :---: | :---: | :---: |
-| 1 | 180.00 | 60 | 2.00 | [填入數值] |
-| 2 | 180.00 | 40 | 2.46 | [填入數值] |
-| 3 | 280.00 | 60 | 2.50 | [填入數值] |
-| 4 | 380.00 | 60 | 2.87 | [填入數值] |
-| 5 | 280.00 | 40 | 3.00 | [填入數值] |
-| 6 | 180.00 | 24 | 3.09 | [填入數值] |
-| 7 | 380.00 | 40 | 3.39 | [填入數值] |
-| 8 | 280.00 | 24 | 3.66 | [填入數值] |
-| 9 | 380.00 | 24 | 4.07 | [填入數值] |
+![Experiment_data](Experiment_data_115034575.jpg)
 
 ### Regression Scatter Plot (學術散布圖)
 ![Regression Scatter Plot](scatter_plot.jpg)
