@@ -1,7 +1,7 @@
 # HCI Assignment 1 (Part II): Fitts' Law Experiment
 FittsLaw_part2 工工系張巧佩
 
-> **Live Demo 網頁體驗**: [點此線上體驗實驗 App](https://<你的GitHub帳號>.github.io/<你的repo名稱>/)
+> **Live Demo 網頁體驗**: [點此線上體驗實驗 App]([https://peggyciao.github.io/HCI_assignment1_FittsLaw_part2_115034575/index.html])
 
 ---
 
@@ -48,7 +48,7 @@ FittsLaw_part2 工工系張巧佩
 | 9 | 380.00 | 24 | 4.07 | [填入數值] |
 
 ### Regression Scatter Plot (學術散布圖)
-![Regression Scatter Plot](./scatter_plot.png)
+![Regression Scatter Plot](scatter_plot.jpg)
 
 ### Custom Fitts' Law Equation
 依據實驗數據進行線性回歸（$MT = a + b \cdot ID$），求得公式如下：
