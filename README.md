@@ -12,7 +12,7 @@ FittsLaw_part2 工工系張巧佩
 ---
 
 ## 2. Innovation Mechanism (創新機制)
-* **Dual-Corner Target Dynamic Inflation (角落目標動態膨脹)**:
+* **Dual-Corner Target Dynamic Inflation (角落目標按鈕動態膨脹)**:
   * 點擊目標分佈於螢幕左上與右上角落，模擬實際功能鍵位置。
   * 當游標/手指接近目標中心 85 px 範圍內時，目標自動放大 1.8 倍，動態擴增有效寬度 $W$。
   * 藉由在運動末期的減速階段（Deceleration Phase）調降難度指數 $ID$，有效縮短微幅修正時間。
@@ -21,7 +21,8 @@ FittsLaw_part2 工工系張巧佩
 
 ## 3. Experiment Screen Recording (實驗錄影)
 
-你可以透過以下方式觀看影片（二擇一）：
+您可以透過以下方式觀看影片（二擇一）：
+
 https://github.com/user-attachments/assets/4acb2068-077e-4d13-9715-a1dd5d1d842c
 <!-- 方式 A：直接放連結與預覽按鈕 -->
 [![Watch the Experiment Video](https://img.shields.io/badge/YouTube-Video_Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/uL5jaONN56E)
