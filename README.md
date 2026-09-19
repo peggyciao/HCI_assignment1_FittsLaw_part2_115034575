@@ -24,7 +24,7 @@ FittsLaw_part2 工工系張巧佩
 你可以透過以下方式展示影片（二擇一）：
 
 <!-- 方式 A：直接放連結與預覽按鈕（推薦） -->
-[![Watch the Experiment Video](https://img.shields.io/badge/YouTube-Video_Demo-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=你的影片ID)
+[![Watch the Experiment Video](https://img.shields.io/badge/YouTube-Video_Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/uL5jaONN56E)
 
 > 點擊上方按鈕前往觀看完整實驗錄影（已設為公開/知道連結者可看）。
 
