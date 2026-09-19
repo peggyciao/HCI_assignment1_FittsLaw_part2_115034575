@@ -1,0 +1,2 @@
+# HCI_assignment1_FittsLaw_part2_115034575
+FittsLaw_part2 工工系張巧佩
