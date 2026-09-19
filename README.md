@@ -1,7 +1,7 @@
 # HCI Assignment 1 (Part II): Fitts' Law Experiment
 FittsLaw_part2 工工系張巧佩
 
-> **Live Demo 網頁體驗**: [點此線上體驗實驗 App]((https://peggyciao.github.io/HCI_assignment1_FittsLaw_part2_115034575/))
+> **Live Demo 網頁體驗**: [點此線上體驗實驗 App](https://peggyciao.github.io/HCI_assignment1_FittsLaw_part2_115034575/)
 
 ---
 
