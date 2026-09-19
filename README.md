@@ -1,11 +1,7 @@
-
-
-
-
 # HCI Assignment 1 (Part II): Fitts' Law Experiment
 FittsLaw_part2 工工系張巧佩
 
-> **Live Demo 網頁體驗**: [點此線上體驗實驗 App](https://<peggyciao>.github.io/<HCI_assignment1_FittsLaw_part2_115034575>/index.html)
+> **Live Demo 網頁體驗**: [點此線上體驗實驗 App](https://<peggyciao>.github.io/<HCI_assignment1_FittsLaw_part2_115034575>/)
 
 ---
 
@@ -25,12 +21,12 @@ FittsLaw_part2 工工系張巧佩
 
 ## 3. Experiment Screen Recording (實驗錄影)
 
-你可以透過以下方式展示影片（二擇一）：
+你可以透過以下方式觀看影片（二擇一）：
 https://github.com/user-attachments/assets/4acb2068-077e-4d13-9715-a1dd5d1d842c
-<!-- 方式 A：直接放連結與預覽按鈕（推薦） -->
+<!-- 方式 A：直接放連結與預覽按鈕 -->
 [![Watch the Experiment Video](https://img.shields.io/badge/YouTube-Video_Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/uL5jaONN56E)
 
-> 點擊上方按鈕前往觀看完整實驗錄影（已設為公開/知道連結者可看）。
+> 點擊上方按鈕前往觀看完整實驗錄影（已設為知道連結者可看）。
 
 ---
 
@@ -41,7 +37,8 @@ https://github.com/user-attachments/assets/4acb2068-077e-4d13-9715-a1dd5d1d842c
 ![Regression Scatter Plot](scatter_plot.jpg)
 
 ### Custom Fitts' Law Equation
-依據實驗數據進行線性回歸（$MT = a + b \cdot ID$），求得公式如下：
+依據實驗數據進行線性回歸（$MT = a + b \cdot ID$）
+，求得公式如下：
 $$MT = [ 249.20] + [ 119.11] \cdot \log_2\left(\frac{A}{W} + 1\right)$$
 * **$R^2$ Score**: `[ 0.7904]`
 * **參數簡評**: 截距 $a$ 反映基礎認知與非動作反應時間；斜率 $b$ 體現資訊處理耗時率。
