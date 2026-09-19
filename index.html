@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitts' Law: Dual-Corner Target Inflation</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+    header { text-align: center; margin-bottom: 16px; }
+    h1 { font-size: 1.45rem; color: #0f172a; font-weight: 700; }
+    p.sub { font-size: 0.9rem; color: #64748b; margin-top: 4px; }
+    
+    #experiment-container {
+      position: relative;
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+    canvas { display: block; cursor: crosshair; }
+    
+    #controls {
+      margin-top: 16px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+    }
+    .btn {
+      padding: 9px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-primary { background: #2563eb; color: #ffffff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: #ffffff; }
+    .btn-success:hover { background: #15803d; }
+    .btn:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
+    
+    #status {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    #results-section {
+      width: 100%;
+      max-width: 800px;
+      margin-top: 24px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      display: none;
+    }
+    #results-section h2 {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      color: #1e293b;
+      font-weight: 600;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      text-align: right;
+    }
+    th, td {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 600;
+    }
+    tr:nth-child(even) { background-color: #f8fafc; }
+    td:first-child, th:first-child { text-align: center; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Fitts' Law Experiment: Dual-Corner Dynamic Inflation</h1>
+    <p class="sub">Scenario: Pointing to Top-Left/Top-Right Corner Targets from Screen Center | 115034575 Chiao-Pei Chang </p>
+  </header>
+
+  <div id="experiment-container">
+    <canvas id="fittsCanvas" width="800" height="560"></canvas>
+  </div>
+
+  <div id="controls">
+    <button id="startBtn" class="btn btn-primary">Start Experiment</button>
+    <button id="downloadBtn" class="btn btn-success" disabled>Export CSV</button>
+    <span id="status">Click "Start Experiment" to initiate (36 trials total).</span>
+  </div>
+
+  <!-- 數據檢查表格 -->
+  <section id="results-section">
+    <h2>Experimental Results (Aggregated Summary)</h2>
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Trial</th>
+          <th>Average Distance (pixels)</th>
+          <th>Width (pixels)</th>
+          <th>Index of Difficulty (bits)</th>
+          <th>Average Time (milliseconds)</th>
+        </tr>
+      </thead>
+      <tbody id="dataBody"></tbody>
+    </table>
+  </section>
+
+  <script>
+    const canvas = document.getElementById("fittsCanvas");
+    const ctx = canvas.getContext("2d");
+    const startBtn = document.getElementById("startBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const statusText = document.getElementById("status");
+    const resultsSection = document.getElementById("results-section");
+    const dataBody = document.getElementById("dataBody");
+
+    // 因子設計: 3 種距離 A x 3 種寬度 W，各重複 4 次 = 36 次試驗
+    const distances = [180, 280, 380];
+    const widths = [24, 40, 60];
+    const repetitions = 4;
+    
+    // 起點固定在螢幕中央偏下方
+    const START_X = 400;
+    const START_Y = 360;
+    const START_R = 24;
+
+    // 角落方向角度：左上角 (-135度) 或 右上角 (-45度)
+    const CORNER_ANGLES = [-135 * Math.PI / 180, -45 * Math.PI / 180];
+
+    let trialQueue = [];
+    let currentTrialIndex = 0;
+    let trialState = "IDLE"; // "IDLE", "WAIT_START", "ACTIVE"
+    let trialStartTime = 0;
+    let rawResults = [];
+    let aggregatedResults = [];
+
+    let target = { x: 0, y: 0, baseR: 12, currentR: 12, direction: "left" };
+    let mousePos = { x: 0, y: 0 };
+    const INFLATION_THRESHOLD = 85; // 進入 85px 內觸發角落放大
+    const INFLATION_RATIO = 1.8;   // 膨脹倍率
+
+    function buildTrialQueue() {
+      let queue = [];
+      distances.forEach(A => {
+        widths.forEach(W => {
+          for (let r = 0; r < repetitions; r++) {
+            // 隨機指定該次試驗是左上角或右上角
+            const dirIndex = Math.random() < 0.5 ? 0 : 1;
+            queue.push({
+              A: A,
+              W: W,
+              angle: CORNER_ANGLES[dirIndex],
+              direction: dirIndex === 0 ? "left" : "right"
+            });
+          }
+        });
+      });
+      // 隨機打亂試驗排程
+      for (let i = queue.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [queue[i], queue[j]] = [queue[j], queue[i]];
+      }
+      return queue;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 繪製模擬手機介面外框與邊界標籤
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "12px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("Top-Left Corner (e.g. Back)", 32, 42);
+      ctx.textAlign = "right";
+      ctx.fillText("Top-Right Corner (e.g. Close / Menu)", canvas.width - 32, 42);
+
+      if (trialState === "IDLE") {
+        ctx.fillStyle = "#64748b";
+        ctx.font = "15px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Click 'Start Experiment' below to initiate.", canvas.width / 2, canvas.height / 2);
+        return;
+      }
+
+      if (trialState === "WAIT_START") {
+        // 繪製中央綠色起點
+        ctx.beginPath();
+        ctx.arc(START_X, START_Y, START_R, 0, Math.PI * 2);
+        ctx.fillStyle = "#16a34a";
+        ctx.fill();
+        ctx.strokeStyle = "#15803d";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("START", START_X, START_Y + 4);
+      }
+
+      if (trialState === "ACTIVE") {
+        const distToTarget = Math.hypot(mousePos.x - target.x, mousePos.y - target.y);
+        const isInflated = distToTarget <= INFLATION_THRESHOLD;
+        target.currentR = isInflated ? (target.baseR * INFLATION_RATIO) : target.baseR;
+
+        // 繪製感應虛線圈
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, INFLATION_THRESHOLD, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(59, 130, 246, 0.35)";
+        ctx.setLineDash([5, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 繪製紅色目標按鈕
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, target.currentR, 0, Math.PI * 2);
+        ctx.fillStyle = "#dc2626";
+        ctx.fill();
+        ctx.strokeStyle = "#991b1b";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 依左右方位在圖示內標示符號 (左上返回鍵 / 右上關閉鍵)
+        ctx.fillStyle = "#ffffff";
+        const iconSize = Math.max(10, Math.round(target.currentR * 0.7));
+        ctx.font = `bold ${iconSize}px sans-serif`;
+        ctx.textAlign = "center";
+        const iconText = target.direction === "left" ? "←" : "✕";
+        ctx.fillText(iconText, target.x, target.y + Math.round(target.currentR * 0.25));
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    canvas.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mousePos.x = e.clientX - rect.left;
+      mousePos.y = e.clientY - rect.top;
+    });
+
+    canvas.addEventListener("mousedown", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      if (trialState === "WAIT_START") {
+        const d = Math.hypot(clickX - START_X, clickY - START_Y);
+        if (d <= START_R) {
+          const config = trialQueue[currentTrialIndex];
+          // 根據距離 A 與隨機指定的左上/右上角度計算目標坐標
+          target.x = START_X + Math.cos(config.angle) * config.A;
+          target.y = START_Y + Math.sin(config.angle) * config.A;
+          target.baseR = config.W / 2;
+          target.currentR = target.baseR;
+          target.direction = config.direction;
+
+          trialState = "ACTIVE";
+          trialStartTime = performance.now();
+          const targetName = config.direction === "left" ? "Top-Left (←)" : "Top-Right (✕)";
+          statusText.textContent = `Trial ${currentTrialIndex + 1} / ${trialQueue.length}: Reach the ${targetName} target!`;
+        }
+      } else if (trialState === "ACTIVE") {
+        const d = Math.hypot(clickX - target.x, clickY - target.y);
+        if (d <= target.currentR) {
+          const mt = performance.now() - trialStartTime;
+          const config = trialQueue[currentTrialIndex];
+
+          rawResults.push({
+            A: config.A,
+            W: config.W,
+            MT: mt
+          });
+
+          currentTrialIndex++;
+          if (currentTrialIndex < trialQueue.length) {
+            trialState = "WAIT_START";
+            statusText.textContent = `Trial ${currentTrialIndex + 1} / ${trialQueue.length}: Return to CENTER START.`;
+          } else {
+            trialState = "IDLE";
+            statusText.textContent = "All trials completed! Summary table updated below.";
+            downloadBtn.disabled = false;
+            startBtn.disabled = false;
+            processAndDisplayData();
+          }
+        }
+      }
+    });
+
+    startBtn.addEventListener("click", () => {
+      trialQueue = buildTrialQueue();
+      rawResults = [];
+      aggregatedResults = [];
+      currentTrialIndex = 0;
+      trialState = "WAIT_START";
+      startBtn.disabled = true;
+      downloadBtn.disabled = true;
+      resultsSection.style.display = "none";
+      dataBody.innerHTML = "";
+      statusText.textContent = `Trial 1 / ${trialQueue.length}: Click CENTER START.`;
+      requestAnimationFrame(draw);
+    });
+
+    function processAndDisplayData() {
+      let grouped = {};
+      rawResults.forEach(r => {
+        const key = `${r.A}_${r.W}`;
+        if (!grouped[key]) {
+          grouped[key] = { A: r.A, W: r.W, times: [] };
+        }
+        grouped[key].times.push(r.MT);
+      });
+
+      aggregatedResults = [];
+      let index = 1;
+      for (const key in grouped) {
+        const item = grouped[key];
+        const avgTime = item.times.reduce((sum, val) => sum + val, 0) / item.times.length;
+        const id = Math.log2(item.A / item.W + 1);
+        aggregatedResults.push({
+          Trial: index++,
+          Distance: item.A.toFixed(2),
+          Width: item.W,
+          ID: id.toFixed(2),
+          AvgTime: avgTime.toFixed(2)
+        });
+      }
+
+      dataBody.innerHTML = "";
+      aggregatedResults.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.Trial}</td>
+          <td>${row.Distance}</td>
+          <td>${row.Width}</td>
+          <td>${row.ID}</td>
+          <td>${row.AvgTime}</td>
+        `;
+        dataBody.appendChild(tr);
+      });
+
+      resultsSection.style.display = "block";
+    }
+
+    downloadBtn.addEventListener("click", () => {
+      if (aggregatedResults.length === 0) return;
+      let csvContent = "\uFEFFTrial,Average Distance (pixels),Width (pixels),Index of Difficulty (bits),Average Time (milliseconds)\n";
+      aggregatedResults.forEach(r => {
+        csvContent += `${r.Trial},${r.Distance},${r.Width},${r.ID},${r.AvgTime}\n`;
+      });
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "Fitts_Law_Part2_Corner_Summary.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    draw();
+  </script>
+</body>
+</html>
