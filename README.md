@@ -37,7 +37,7 @@ https://github.com/user-attachments/assets/4acb2068-077e-4d13-9715-a1dd5d1d842c
 ![Regression Scatter Plot](scatter_plot.jpg)
 
 ### Custom Fitts' Law Equation
-依據實驗數據進行線性回歸（$MT = a + b \cdot ID$）
+依據實驗數據進行線性回歸（$$MT = a + b \cdot ID$$）
 ，求得公式如下：
 $$MT = [ 249.20] + [ 119.11] \cdot \log_2\left(\frac{A}{W} + 1\right)$$
 * **$R^2$ Score**: `[ 0.7904]`
