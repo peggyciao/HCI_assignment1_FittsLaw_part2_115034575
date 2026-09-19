@@ -52,6 +52,6 @@ FittsLaw_part2 工工系張巧佩
 
 ### Custom Fitts' Law Equation
 依據實驗數據進行線性回歸（$MT = a + b \cdot ID$），求得公式如下：
-$$MT = [填入截距 a] + [填入斜率 b] \cdot \log_2\left(\frac{A}{W} + 1\right)$$
-* **$R^2$ Score**: `[填入 R平方數值]`
+$$MT = [ 249.20] + [ 119.11] \cdot \log_2\left(\frac{A}{W} + 1\right)$$
+* **$R^2$ Score**: `[ 0.7904]`
 * **參數簡評**: 截距 $a$ 反映基礎認知與非動作反應時間；斜率 $b$ 體現資訊處理耗時率。
